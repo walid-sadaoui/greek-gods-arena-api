@@ -8,10 +8,10 @@ export default class HttpError extends Error {
   isOperational: boolean;
 
   constructor(
-    statusCode = 500,
+    statusCode: number,
     descritpion: string,
     message: string,
-    isOperational = false
+    isOperational: boolean
   ) {
     super();
 
