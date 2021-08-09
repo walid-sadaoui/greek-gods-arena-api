@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../../../config';
 import HttpError from '../httpError';
 
 config.nodeEnv = 'test';
