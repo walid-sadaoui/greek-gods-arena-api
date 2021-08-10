@@ -69,19 +69,19 @@ const signUp = async (
   password: string
 ): Promise<UserData> => {
   try {
-    // if (!username || !password) {
-    //   throw new HttpError(
-    //     400,
-    //     'Auth error',
-    //     'Email and Password are required',
-    //     true
-    //   );
-    // }
+    if (!username || !password) {
+      throw new HttpError(
+        400,
+        'Auth error',
+        'Username and Password are required',
+        true
+      );
+    }
 
-    // const usernameExist = await User.findOne({ username }).lean();
-    // if (usernameExist) {
-    //   throw new HttpError(409, 'Auth error', 'Username already exists', true);
-    // }
+    const usernameExist = await User.findOne({ username }).lean();
+    if (usernameExist) {
+      throw new HttpError(409, 'Auth error', 'Username already exists', true);
+    }
 
     // if (!validatePassword(password)) {
     //   throw new HttpError(
@@ -115,7 +115,7 @@ const signUp = async (
     return userInfo;
   } catch (error) {
     throw new HttpError(
-      error.httpCode || 500,
+      error.statusCode || 500,
       'Auth error',
       error.message || 'There was a problem logging into your account',
       true

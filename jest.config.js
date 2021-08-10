@@ -11,7 +11,7 @@ module.exports = {
         publicPath: './html-report',
         filename: 'report.html',
         expand: true,
-        openReport: true,
+        openReport: false,
       },
     ],
   ],
