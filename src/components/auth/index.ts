@@ -1,6 +1,6 @@
-import { UserData } from 'components/users/userModel';
+import { UserData } from '../users/userModel';
 import express from 'express';
-import { signUp } from './authService';
+import { logIn, signUp } from './authService';
 
 const router = express.Router();
 
@@ -11,19 +11,9 @@ router.get('/', (_req, res) => {
 
 router.post('/signup', async (req, res, next) => {
   try {
-    // const { user } = req.session;
-    // if (user) {
-    //   throw new AppError(
-    //     'Auth error',
-    //     400,
-    //     'A User is already logged in',
-    //     true
-    //   );
-    // }
+    const { username, email, password } = req.body;
 
-    const { username, password } = req.body;
-
-    const newUser: UserData = await signUp(username, password);
+    const newUser: UserData = await signUp(username, email, password);
 
     return res.status(201).json({
       data: {
@@ -37,32 +27,18 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
-router.post('/login', async (_req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
-    // if (user) {
-    //   throw new AppError('Auth error', 400, 'User already logged in', true);
-    // }
-
-    // const { email, password } = req.body;
-    // const userLoggedIn = await logIn(email, password);
+    const { email, password } = req.body;
+    const { userInfo, token, refreshToken } = await logIn(email, password);
 
     return res.status(200).json({
       data: {
         code: 200,
         message: 'User signed in!',
-        // user: userLoggedIn,
-      },
-    });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-router.post('/logout', (_req, res, next) => {
-  try {
-    return res.status(200).json({
-      data: {
-        message: 'Logout successful',
+        user: userInfo,
+        token,
+        refreshToken,
       },
     });
   } catch (error) {

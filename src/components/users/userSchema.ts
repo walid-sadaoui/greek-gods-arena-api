@@ -8,12 +8,13 @@ const userSchema = new Schema(
       type: String,
       unique: [true, 'This Username is already used'],
     },
+    email: {
+      type: String,
+      unique: [true, 'This email is already used'],
+    },
     password: {
       type: String,
       required: true,
-    },
-    token: {
-      type: String,
     },
   },
   { timestamps: true }

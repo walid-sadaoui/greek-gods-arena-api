@@ -1,8 +1,8 @@
-export interface User {
+export interface UserInfo {
   _id: string;
   username: string;
+  email: string;
   password: string;
-  token: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -10,16 +10,16 @@ export interface User {
 export interface UserData {
   _id: string;
   username: string;
-  token: string;
+  email: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface DatabaseUser extends User {
+export interface DatabaseUser extends UserInfo {
   _id: string;
   username: string;
+  email: string;
   password: string;
-  token: string;
   __v: number;
   createdAt: Date;
   updatedAt: Date;
