@@ -182,7 +182,7 @@ describe('Authentication', () => {
       const loginResponse = await request(app)
         .post(`/login`)
         .send({ email: userInfo.email, password: userInfo.password });
-      console.log(loginResponse.body);
+
       expect(loginResponse).toBeTruthy();
       expect(loginResponse.status).toBe(200);
       expect(loginResponse.body.data.message).toBe('User signed in!');
