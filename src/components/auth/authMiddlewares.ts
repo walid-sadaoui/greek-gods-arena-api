@@ -19,7 +19,7 @@ const decodeHeader = (
     }
     const decoded = verifyJWT(token);
     if (!decoded)
-      throw new HttpError(403, 'Auth error', 'Invalid signature', true);
+      throw new HttpError(401, 'Auth error', 'Invalid signature', true);
     if (decoded) req.user = decoded;
 
     req.token = token;

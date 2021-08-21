@@ -280,50 +280,5 @@ describe('Authentication', () => {
       );
       expect(loginResponse.body.error.statusCode).toBe(400);
     });
-    // test('When username not provided, should throw error and return 400', async () => {
-    //   const newUser = {
-    //     password: 'password',
-    //   };
-    //   const loginResponse = await request(app).post(`/login`).send(newUser);
-
-    //   expect(loginResponse).toBeTruthy();
-    //   expect(loginResponse.status).toBe(400);
-    //   expect(loginResponse.body.error.message).toBe(
-    //     'Username and Password are required'
-    //   );
-    //   expect(loginResponse.body.error.description).toBe('Auth error');
-    //   expect(loginResponse.body.error.statusCode).toBe(400);
-    //   expect(loginResponse.body.error.isOperational).toBe(true);
-    // });
-    // test('When password not provided, should throw error and return 400', async () => {
-    //   const newUser = {
-    //     username: 'username',
-    //   };
-    //   const loginResponse = await request(app).post(`/login`).send(newUser);
-
-    //   expect(loginResponse).toBeTruthy();
-    //   expect(loginResponse.status).toBe(400);
-    //   expect(loginResponse.body.error.message).toBe(
-    //     'Username and Password are required'
-    //   );
-    //   expect(loginResponse.body.error.description).toBe('Auth error');
-    //   expect(loginResponse.body.error.statusCode).toBe(400);
-    //   expect(loginResponse.body.error.isOperational).toBe(true);
-    // });
-    // test('When username already exists, should throw error and return 409', async () => {
-    //   const newUser = {
-    //     username: 'username',
-    //     password: 'password',
-    //   };
-    //   await request(app).post(`/login`).send(newUser);
-    //   const loginResponse = await request(app).post(`/login`).send(newUser);
-
-    //   expect(loginResponse).toBeTruthy();
-    //   expect(loginResponse.status).toBe(409);
-    //   expect(loginResponse.body.error.message).toBe('Username already exists');
-    //   expect(loginResponse.body.error.description).toBe('Auth error');
-    //   expect(loginResponse.body.error.statusCode).toBe(409);
-    //   expect(loginResponse.body.error.isOperational).toBe(true);
-    // });
   });
 });

@@ -1,3 +1,4 @@
+import characterSchema from '../characters/characterSchema';
 import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
@@ -16,6 +17,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    characters: [characterSchema],
   },
   { timestamps: true }
 );

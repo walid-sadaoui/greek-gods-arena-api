@@ -2,6 +2,8 @@ import { hashPassword } from '../../components/auth/authService';
 import User from '../../components/users/userSchema';
 import * as faker from 'faker';
 import { UserInfo } from '../../components/users/userModel';
+import { GreekGods } from '../../components/characters/characterService';
+import { Character } from '../../components/characters/characterModel';
 
 export enum FakePassword {
   GOOD = 'abcABC123456!',
@@ -27,4 +29,27 @@ export const createUser = async (): Promise<UserInfo> => {
   const { password: userPassword, __v, ...rest } = userSignedUp.toObject();
   const userInfo = { ...rest, password };
   return userInfo;
+};
+
+export const createCharacter = async (userId: string): Promise<Character> => {
+  const currentUser = await User.findOne({ _id: userId });
+  const newCharacter = new Character(GreekGods.ZEUS);
+  currentUser.characters.push(newCharacter);
+  await currentUser.save();
+  return newCharacter;
+};
+
+export const createCharacters = async (
+  userId: string,
+  number: number
+): Promise<Character[]> => {
+  const currentUser = await User.findOne({ _id: userId });
+  const greekGods = Object.values(GreekGods);
+  for (let index = 0; index < (number > 10 ? 10 : number); index++) {
+    const greekGod = greekGods[index];
+    const newCharacter = new Character(greekGod);
+    currentUser.characters.push(newCharacter);
+  }
+  await currentUser.save();
+  return currentUser.characters;
 };

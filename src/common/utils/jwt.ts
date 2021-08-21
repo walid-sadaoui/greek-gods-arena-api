@@ -15,7 +15,6 @@ const generateJwt = (payload: any, exp: string): string => {
 const verifyJWT = (payload: any) => {
   if (config.jwtSecret) {
     const token = jwt.verify(payload, config.jwtSecret);
-    console.log('Verify token : ', token);
     return token;
   } else {
     throw new Error('JWT not verified !');
