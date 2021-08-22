@@ -1,6 +1,7 @@
 import HttpError from '../../common/error/httpError';
 import { verifyJWT } from '../../common/utils/jwt';
 import { Request, Response, NextFunction } from 'express';
+import { UserData } from '../users/userModel';
 
 const decodeHeader = (
   req: Request,
@@ -17,7 +18,7 @@ const decodeHeader = (
       if (!token || token === '')
         throw new HttpError(401, 'Auth error', 'No token provided', true);
     }
-    const decoded = verifyJWT(token);
+    const decoded = <UserData>verifyJWT(token);
     if (!decoded)
       throw new HttpError(401, 'Auth error', 'Invalid signature', true);
     if (decoded) req.user = decoded;
@@ -29,4 +30,25 @@ const decodeHeader = (
   }
 };
 
-export { decodeHeader };
+const validateUserIdRequestParam = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
+  try {
+    const { id } = req.params;
+    const user = <UserData>req.user;
+    if (user?._id !== id)
+      throw new HttpError(
+        401,
+        'Auth error',
+        `You are not authorized to access these datas !`,
+        true
+      );
+    return next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { decodeHeader, validateUserIdRequestParam };

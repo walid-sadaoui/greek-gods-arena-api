@@ -16,19 +16,23 @@ export enum FakePassword {
 }
 
 export const createUser = async (): Promise<UserInfo> => {
-  const username = faker.internet.userName();
-  const email = faker.internet.email();
-  const password = FakePassword.GOOD;
-  const hashedPassword: string = await hashPassword(password);
-  const newUser = new User({
-    username,
-    email,
-    password: hashedPassword,
-  });
-  const userSignedUp = await newUser.save();
-  const { password: userPassword, __v, ...rest } = userSignedUp.toObject();
-  const userInfo = { ...rest, password };
-  return userInfo;
+  try {
+    const username = faker.internet.userName();
+    const email = faker.internet.email();
+    const password = FakePassword.GOOD;
+    const hashedPassword: string = await hashPassword(password);
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+    });
+    const userSignedUp = await newUser.save();
+    const { password: userPassword, __v, ...rest } = userSignedUp.toObject();
+    const userInfo: UserInfo = { ...rest, password };
+    return userInfo;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const createCharacter = async (userId: string): Promise<Character> => {

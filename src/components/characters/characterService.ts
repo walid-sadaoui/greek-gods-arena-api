@@ -1,3 +1,4 @@
+import { UserInfo } from '../users/userModel';
 import HttpError from '../../common/error/httpError';
 import User from '../users/userSchema';
 import { Character } from './characterModel';
@@ -62,8 +63,26 @@ export const createCharacter = async (
   } catch (error) {
     throw new HttpError(
       error.statusCode || 500,
-      'User error',
+      'Create Character Error',
       error.message || 'There was a problem creating the new character',
+      true
+    );
+  }
+};
+
+export const getCharacters = async (userId: string): Promise<Character[]> => {
+  try {
+    const currentUser: UserInfo = await User.findOne(
+      { _id: userId },
+      'characters'
+    );
+    const characters: Character[] = currentUser.characters;
+    return characters;
+  } catch (error) {
+    throw new HttpError(
+      error.statusCode || 500,
+      'Get Characters Error',
+      error.message || 'There was a problem retrieving the characters',
       true
     );
   }

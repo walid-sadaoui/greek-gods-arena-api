@@ -19,7 +19,6 @@ let userId: string;
 beforeAll(async () => await db.connect());
 beforeEach(async () => {
   const userInfo: UserInfo = await createUser();
-
   const loginResponse = await request(app)
     .post(`/login`)
     .send({ email: userInfo.email, password: userInfo.password });
@@ -99,6 +98,59 @@ describe('Users', () => {
       expect(createCharacterResponse.status).toBe(400);
       expect(createCharacterResponse.body.error.message).toBe(
         `You cannot own more than 10 characters !`
+      );
+    });
+    test('When request params id different than logged user id, should throw Error and return 401', async () => {
+      const secondUser = await createUser();
+      const getCharactersResponse = await request(app)
+        .post(`/users/${secondUser._id}/characters`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ characterName: GreekGods.POSEIDON });
+
+      expect(getCharactersResponse).toBeTruthy();
+      expect(getCharactersResponse.status).toBe(401);
+      expect(getCharactersResponse.body.error.message).toBe(
+        `You are not authorized to access these datas !`
+      );
+    });
+  });
+  describe('Get Characters : GET /users/:id/characters', () => {
+    test('When user logged in, should return the list of characters the user owns and return 200', async () => {
+      const characters = await createCharacters(userId, 10);
+
+      const getCharactersResponse = await request(app)
+        .get(`/users/${userId}/characters`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(getCharactersResponse).toBeTruthy();
+      expect(getCharactersResponse.status).toBe(200);
+      expect(getCharactersResponse.body.data.message).toBe(
+        `${characters.length} characters found !`
+      );
+      expect(getCharactersResponse.body.data.code).toBe(200);
+      expect(getCharactersResponse.body.data.characters.length).toBe(
+        characters.length
+      );
+    });
+    test('When user not authenticated, should throw Error and return 401', async () => {
+      const getCharactersResponse = await request(app).get(
+        `/users/${userId}/characters`
+      );
+
+      expect(getCharactersResponse).toBeTruthy();
+      expect(getCharactersResponse.status).toBe(401);
+      expect(getCharactersResponse.body.error.message).toBe(
+        'No token provided'
+      );
+    });
+    test('When request params id different than logged user id, should throw Error and return 401', async () => {
+      const secondUser = await createUser();
+      const getCharactersResponse = await request(app)
+        .get(`/users/${secondUser._id}/characters`)
+        .set('Authorization', `Bearer ${token}`);
+      expect(getCharactersResponse).toBeTruthy();
+      expect(getCharactersResponse.status).toBe(401);
+      expect(getCharactersResponse.body.error.message).toBe(
+        `You are not authorized to access these datas !`
       );
     });
   });
