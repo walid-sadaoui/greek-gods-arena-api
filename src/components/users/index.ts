@@ -3,9 +3,14 @@ import {
   validateUserIdRequestParam,
 } from '../auth/authMiddlewares';
 import express from 'express';
-import { createCharacter, getCharacters } from '../characters/characterService';
+import {
+  createCharacter,
+  getCharacter,
+  getCharacters,
+} from '../characters/characterService';
 
 const router = express.Router();
+
 router.get(
   '/:id/characters',
   decodeHeader,
@@ -29,6 +34,29 @@ router.get(
   }
 );
 
+router.get(
+  '/:id/characters/:characterName',
+  decodeHeader,
+  validateUserIdRequestParam,
+  async (req, res, next) => {
+    try {
+      const { id, characterName } = req.params;
+
+      const character = await getCharacter(id, characterName);
+
+      return res.status(200).json({
+        data: {
+          code: 200,
+          message: `Character ${character.name} found !`,
+          character,
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
+
 router.post(
   '/:id/characters',
   decodeHeader,
@@ -37,6 +65,7 @@ router.post(
     try {
       const { id } = req.params;
       const { characterName } = req.body;
+
       const character = await createCharacter(characterName, id);
 
       return res.status(200).json({

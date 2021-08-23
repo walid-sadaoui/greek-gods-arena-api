@@ -154,4 +154,69 @@ describe('Users', () => {
       );
     });
   });
+  describe('Get Character : GET /users/:id/characters/:characterName', () => {
+    test('When user logged in, should return the list of characters the user owns and return 200', async () => {
+      const characters = await createCharacters(userId, 10);
+      const getCharacterResponse = await request(app)
+        .get(`/users/${userId}/characters/${characters[0].name}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getCharacterResponse).toBeTruthy();
+      expect(getCharacterResponse.status).toBe(200);
+      expect(getCharacterResponse.body.data.message).toBe(
+        `Character ${characters[0].name} found !`
+      );
+      expect(getCharacterResponse.body.data.code).toBe(200);
+      expect(getCharacterResponse.body.data.character).toEqual(
+        new Character(characters[0].name)
+      );
+    });
+    test('When user not authenticated, should throw Error and return 401', async () => {
+      const characters = await createCharacters(userId, 10);
+
+      const getCharacterResponse = await request(app).get(
+        `/users/${userId}/characters/${characters[0].name}`
+      );
+
+      expect(getCharacterResponse).toBeTruthy();
+      expect(getCharacterResponse.status).toBe(401);
+      expect(getCharacterResponse.body.error.message).toBe('No token provided');
+    });
+    test('When request params id different than logged user id, should throw Error and return 401', async () => {
+      const secondUser = await createUser();
+      const characters = await createCharacters(userId, 10);
+
+      const getCharacterResponse = await request(app)
+        .get(`/users/${secondUser._id}/characters/${characters[0].name}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getCharacterResponse).toBeTruthy();
+      expect(getCharacterResponse.status).toBe(401);
+      expect(getCharacterResponse.body.error.message).toBe(
+        `You are not authorized to access these datas !`
+      );
+    });
+    test('When invalid Greek God name provided, should throw Error and return 422', async () => {
+      const getCharacterResponse = await request(app)
+        .get(`/users/${userId}/characters/invalidGreekGod`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getCharacterResponse).toBeTruthy();
+      expect(getCharacterResponse.status).toBe(422);
+      expect(getCharacterResponse.body.error.message).toBe(
+        `You need to provide a valid Greek God name !`
+      );
+    });
+    test('When character not in list, should throw error and return 404', async () => {
+      const getCharacterResponse = await request(app)
+        .get(`/users/${userId}/characters/${GreekGods.APHRODITE}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getCharacterResponse).toBeTruthy();
+      expect(getCharacterResponse.status).toBe(404);
+      expect(getCharacterResponse.body.error.message).toBe(
+        `Character ${GreekGods.APHRODITE} is not in you characters list !`
+      );
+    });
+  });
 });

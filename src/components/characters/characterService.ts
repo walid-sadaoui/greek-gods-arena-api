@@ -20,19 +20,24 @@ export enum GreekGods {
   ZEUS = 'ZEUS',
 }
 
+const validateCharacterName = (characterName: string) => {
+  if (!(characterName in GreekGods))
+    throw new HttpError(
+      422,
+      'Create Character Error',
+      `You need to provide a valid Greek God name !`,
+      true
+    );
+};
+
 export const createCharacter = async (
-  name: string,
+  characterName: string,
   userId: string
 ): Promise<Character> => {
   try {
-    if (!(name in GreekGods))
-      throw new HttpError(
-        422,
-        'Create Character Error',
-        `You need to provide a valid Greek God name !`,
-        true
-      );
-    const newCharacter = new Character(name);
+    validateCharacterName(characterName);
+
+    const newCharacter = new Character(characterName);
     const currentUser = await User.findOne({ _id: userId }, 'characters');
     if (currentUser.characters.length >= 10)
       throw new HttpError(
@@ -43,7 +48,7 @@ export const createCharacter = async (
       );
 
     const characterExists = currentUser.characters.find(
-      (character: Character) => character.name === name
+      (character: Character) => character.name === characterName
     );
 
     if (characterExists)
@@ -56,9 +61,11 @@ export const createCharacter = async (
 
     currentUser.characters.push(newCharacter);
     const updatedUser = await currentUser.save();
+
     const createdCharacter = updatedUser.characters.find(
-      (character: Character) => character.name === name
+      (character: Character) => character.name === characterName
     );
+
     return createdCharacter;
   } catch (error) {
     throw new HttpError(
@@ -77,7 +84,42 @@ export const getCharacters = async (userId: string): Promise<Character[]> => {
       'characters'
     );
     const characters: Character[] = currentUser.characters;
+
     return characters;
+  } catch (error) {
+    throw new HttpError(
+      error.statusCode || 500,
+      'Get Characters Error',
+      error.message || 'There was a problem retrieving the characters',
+      true
+    );
+  }
+};
+
+export const getCharacter = async (
+  userId: string,
+  characterName: string
+): Promise<Character> => {
+  try {
+    validateCharacterName(characterName);
+
+    const currentUser: UserInfo = await User.findOne(
+      { _id: userId },
+      'characters'
+    );
+    const character: Character | undefined = currentUser.characters.find(
+      (character: Character) => character.name === characterName
+    );
+
+    if (!character)
+      throw new HttpError(
+        404,
+        'Create Character Error',
+        `Character ${characterName} is not in you characters list !`,
+        true
+      );
+
+    return character;
   } catch (error) {
     throw new HttpError(
       error.statusCode || 500,
