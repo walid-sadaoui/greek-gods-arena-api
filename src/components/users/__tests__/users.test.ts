@@ -10,6 +10,7 @@ import {
 import { GreekGods } from '../../characters/characterService';
 import { Character } from '../../characters/characterModel';
 import { UserInfo } from '../userModel';
+import User from '../userSchema';
 
 config.nodeEnv = 'test';
 
@@ -215,6 +216,72 @@ describe('Users', () => {
       expect(getCharacterResponse).toBeTruthy();
       expect(getCharacterResponse.status).toBe(404);
       expect(getCharacterResponse.body.error.message).toBe(
+        `Character ${GreekGods.APHRODITE} is not in you characters list !`
+      );
+    });
+  });
+  describe('Delete Character : DELETE /users/:id/characters/:characterName', () => {
+    test('When user logged in, should delete the character specified and return 200', async () => {
+      const characters = await createCharacters(userId, 10);
+      const deleteCharacterResponse = await request(app)
+        .delete(`/users/${userId}/characters/${characters[0].name}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      const currentUser = await User.findOne({ _id: userId }, 'characters');
+      expect(deleteCharacterResponse).toBeTruthy();
+      expect(deleteCharacterResponse.status).toBe(200);
+      expect(deleteCharacterResponse.body.data.message).toBe(
+        `Character ${characters[0].name} deleted !`
+      );
+      expect(deleteCharacterResponse.body.data.code).toBe(200);
+      expect(currentUser.characters.length).toBe(characters.length - 1);
+    });
+    test('When user not authenticated, should throw Error and return 401', async () => {
+      const characters = await createCharacters(userId, 10);
+
+      const deleteCharacterResponse = await request(app).delete(
+        `/users/${userId}/characters/${characters[0].name}`
+      );
+
+      expect(deleteCharacterResponse).toBeTruthy();
+      expect(deleteCharacterResponse.status).toBe(401);
+      expect(deleteCharacterResponse.body.error.message).toBe(
+        'No token provided'
+      );
+    });
+    test('When request params id different than logged user id, should throw Error and return 401', async () => {
+      const secondUser = await createUser();
+      const characters = await createCharacters(userId, 10);
+
+      const deleteCharacterResponse = await request(app)
+        .delete(`/users/${secondUser._id}/characters/${characters[0].name}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(deleteCharacterResponse).toBeTruthy();
+      expect(deleteCharacterResponse.status).toBe(401);
+      expect(deleteCharacterResponse.body.error.message).toBe(
+        `You are not authorized to access these datas !`
+      );
+    });
+    test('When invalid Greek God name provided, should throw Error and return 422', async () => {
+      const deleteCharacterResponse = await request(app)
+        .delete(`/users/${userId}/characters/invalidGreekGod`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(deleteCharacterResponse).toBeTruthy();
+      expect(deleteCharacterResponse.status).toBe(422);
+      expect(deleteCharacterResponse.body.error.message).toBe(
+        `You need to provide a valid Greek God name !`
+      );
+    });
+    test('When character not in list, should throw error and return 404', async () => {
+      const deleteCharacterResponse = await request(app)
+        .delete(`/users/${userId}/characters/${GreekGods.APHRODITE}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(deleteCharacterResponse).toBeTruthy();
+      expect(deleteCharacterResponse.status).toBe(404);
+      expect(deleteCharacterResponse.body.error.message).toBe(
         `Character ${GreekGods.APHRODITE} is not in you characters list !`
       );
     });

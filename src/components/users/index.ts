@@ -5,6 +5,7 @@ import {
 import express from 'express';
 import {
   createCharacter,
+  deleteCharacter,
   getCharacter,
   getCharacters,
 } from '../characters/characterService';
@@ -73,6 +74,28 @@ router.post(
           code: 200,
           message: 'Character created !',
           character,
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
+
+router.delete(
+  '/:id/characters/:characterName',
+  decodeHeader,
+  validateUserIdRequestParam,
+  async (req, res, next) => {
+    try {
+      const { id, characterName } = req.params;
+
+      await deleteCharacter(id, characterName);
+
+      return res.status(200).json({
+        data: {
+          code: 200,
+          message: `Character ${characterName} deleted !`,
         },
       });
     } catch (error) {

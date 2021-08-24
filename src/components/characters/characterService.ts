@@ -129,3 +129,39 @@ export const getCharacter = async (
     );
   }
 };
+
+export const deleteCharacter = async (
+  userId: string,
+  characterName: string
+): Promise<void> => {
+  try {
+    validateCharacterName(characterName);
+
+    const currentUser = await User.findOne({ _id: userId }, 'characters');
+    const characterToDelete: Character | undefined =
+      currentUser.characters.find(
+        (character: Character) => character.name === characterName
+      );
+
+    if (!characterToDelete)
+      throw new HttpError(
+        404,
+        'Delete Character Error',
+        `Character ${characterName} is not in you characters list !`,
+        true
+      );
+
+    const updatedCharactersList = currentUser.characters.filter(
+      (character: Character) => character.name !== characterToDelete.name
+    );
+    currentUser.characters = updatedCharactersList;
+    await currentUser.save();
+  } catch (error) {
+    throw new HttpError(
+      error.statusCode || 500,
+      'Delete Characters Error',
+      error.message || 'There was a problem retrieving the characters',
+      true
+    );
+  }
+};
