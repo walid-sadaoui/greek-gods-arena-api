@@ -1,7 +1,7 @@
-import { UserInfo } from '../users/userModel';
 import HttpError from '../../common/error/httpError';
-import User from '../users/userSchema';
 import { Character } from './characterModel';
+import * as CharacterDM from './characterDataManager';
+import * as UserDM from '../users/userDataManager';
 
 export enum GreekGods {
   APHRODITE = 'APHRODITE',
@@ -20,6 +20,108 @@ export enum GreekGods {
   ZEUS = 'ZEUS',
 }
 
+interface CharacterProperties {
+  health: number;
+  attack: number;
+  defense: number;
+  magik: number;
+}
+
+const validateCharacterNewProperties = (
+  character: Character,
+  updatedCharacterValues: CharacterProperties
+) => {
+  const { attack, defense, health, magik } = updatedCharacterValues;
+  if (attack < 0 || defense < 0 || health < 0 || magik < 0)
+    throw new HttpError(
+      400,
+      'Update Character Error',
+      `You cannot have negative values for attack, defense, health and magik !`,
+      true
+    );
+
+  if (character.skillPoints === 0)
+    throw new HttpError(
+      400,
+      'Update Character Error',
+      `Your character has 0 skillPoints, it cannot be updated`,
+      true
+    );
+};
+const calculateSkillPointsUsed = (
+  previousValue: number,
+  newValue: number
+): number => {
+  if (newValue < previousValue)
+    throw new HttpError(
+      400,
+      'Update Character Error',
+      'You cannot reduce skill amount !',
+      true
+    );
+  if (newValue === previousValue) return 0;
+
+  let skillPointsUsed = 0;
+  for (let index = 0; index < newValue - previousValue; index++) {
+    skillPointsUsed = skillPointsUsed + Math.ceil((previousValue + index) / 5);
+  }
+  return skillPointsUsed;
+};
+
+const calculateHealthSkillPointsUsed = (
+  previousValue: number,
+  newValue: number
+): number => {
+  if (newValue < previousValue)
+    throw new HttpError(
+      400,
+      'Update Character Error',
+      'You cannot reduce skill amount !',
+      true
+    );
+  if (newValue === previousValue) return 0;
+
+  const skillPointsUsed = newValue - previousValue;
+  return skillPointsUsed;
+};
+
+const validateSkillPoints = (
+  character: Character,
+  updatedCharacterValues: CharacterProperties
+): number => {
+  const healthkSkillPoints = calculateHealthSkillPointsUsed(
+    character.health,
+    updatedCharacterValues.health
+  );
+  const attackSkillPoints = calculateSkillPointsUsed(
+    character.attack,
+    updatedCharacterValues.attack
+  );
+  const defenseSkillPoints = calculateSkillPointsUsed(
+    character.defense,
+    updatedCharacterValues.defense
+  );
+  const magikSkillPoints = calculateSkillPointsUsed(
+    character.magik,
+    updatedCharacterValues.magik
+  );
+  const skillPointsUsed =
+    healthkSkillPoints +
+    attackSkillPoints +
+    defenseSkillPoints +
+    magikSkillPoints;
+  if (skillPointsUsed > character.skillPoints) {
+    throw new HttpError(
+      400,
+      'Update Character Error',
+      `You used more skillPoints than your character can use !`,
+      true
+    );
+  }
+  const updatedSkillPoints = character.skillPoints - skillPointsUsed;
+  return updatedSkillPoints;
+};
+
 const validateCharacterName = (characterName: string) => {
   if (!(characterName in GreekGods))
     throw new HttpError(
@@ -30,6 +132,22 @@ const validateCharacterName = (characterName: string) => {
     );
 };
 
+const validateCharacterUpdate = (
+  character: Character,
+  updatedCharacterProperties: CharacterProperties
+): Omit<Character, 'name' | 'level'> => {
+  validateCharacterNewProperties(character, updatedCharacterProperties);
+  const updatedSkillPoints: number = validateSkillPoints(
+    character,
+    updatedCharacterProperties
+  );
+  const characterProperties: Omit<Character, 'name' | 'level'> = {
+    ...updatedCharacterProperties,
+    skillPoints: updatedSkillPoints,
+  };
+  return characterProperties;
+};
+
 export const createCharacter = async (
   characterName: string,
   userId: string
@@ -37,8 +155,8 @@ export const createCharacter = async (
   try {
     validateCharacterName(characterName);
 
-    const newCharacter = new Character(characterName);
-    const currentUser = await User.findOne({ _id: userId }, 'characters');
+    const currentUser = await UserDM.getUser(userId);
+
     if (currentUser.characters.length >= 10)
       throw new HttpError(
         400,
@@ -47,10 +165,10 @@ export const createCharacter = async (
         true
       );
 
-    const characterExists = currentUser.characters.find(
-      (character: Character) => character.name === characterName
+    const characterExists = await CharacterDM.getCharacterByName(
+      currentUser,
+      characterName
     );
-
     if (characterExists)
       throw new HttpError(
         409,
@@ -59,12 +177,21 @@ export const createCharacter = async (
         true
       );
 
-    currentUser.characters.push(newCharacter);
-    const updatedUser = await currentUser.save();
-
-    const createdCharacter = updatedUser.characters.find(
-      (character: Character) => character.name === characterName
+    const updatedUser = await CharacterDM.createCharacter(
+      currentUser,
+      characterName
     );
+    const createdCharacter = await CharacterDM.getCharacterByName(
+      updatedUser,
+      characterName
+    );
+    if (!createdCharacter)
+      throw new HttpError(
+        400,
+        'Create Character Error',
+        `There was an error while creating your character ${characterName} !`,
+        true
+      );
 
     return createdCharacter;
   } catch (error) {
@@ -79,12 +206,10 @@ export const createCharacter = async (
 
 export const getCharacters = async (userId: string): Promise<Character[]> => {
   try {
-    const currentUser: UserInfo = await User.findOne(
-      { _id: userId },
-      'characters'
+    const currentUser = await UserDM.getUser(userId);
+    const characters: Character[] = await CharacterDM.getCharacters(
+      currentUser
     );
-    const characters: Character[] = currentUser.characters;
-
     return characters;
   } catch (error) {
     throw new HttpError(
@@ -103,12 +228,10 @@ export const getCharacter = async (
   try {
     validateCharacterName(characterName);
 
-    const currentUser: UserInfo = await User.findOne(
-      { _id: userId },
-      'characters'
-    );
-    const character: Character | undefined = currentUser.characters.find(
-      (character: Character) => character.name === characterName
+    const currentUser = await UserDM.getUser(userId);
+    const character = await CharacterDM.getCharacterByName(
+      currentUser,
+      characterName
     );
 
     if (!character)
@@ -123,7 +246,7 @@ export const getCharacter = async (
   } catch (error) {
     throw new HttpError(
       error.statusCode || 500,
-      'Get Characters Error',
+      'Get Character Error',
       error.message || 'There was a problem retrieving the characters',
       true
     );
@@ -137,11 +260,9 @@ export const deleteCharacter = async (
   try {
     validateCharacterName(characterName);
 
-    const currentUser = await User.findOne({ _id: userId }, 'characters');
+    const currentUser = await UserDM.getUser(userId);
     const characterToDelete: Character | undefined =
-      currentUser.characters.find(
-        (character: Character) => character.name === characterName
-      );
+      await CharacterDM.getCharacterByName(currentUser, characterName);
 
     if (!characterToDelete)
       throw new HttpError(
@@ -151,16 +272,50 @@ export const deleteCharacter = async (
         true
       );
 
-    const updatedCharactersList = currentUser.characters.filter(
-      (character: Character) => character.name !== characterToDelete.name
-    );
-    currentUser.characters = updatedCharactersList;
-    await currentUser.save();
+    await CharacterDM.deleteCharacter(currentUser, characterName);
   } catch (error) {
     throw new HttpError(
       error.statusCode || 500,
       'Delete Characters Error',
       error.message || 'There was a problem retrieving the characters',
+      true
+    );
+  }
+};
+
+export const updateCharacter = async (
+  userId: string,
+  characterName: string,
+  newCharacterProperties: CharacterProperties
+): Promise<Character> => {
+  try {
+    validateCharacterName(characterName);
+
+    const currentUser = await UserDM.getUser(userId);
+    const characterToUpdate: Character | undefined =
+      await CharacterDM.getCharacterByName(currentUser, characterName);
+    if (!characterToUpdate)
+      throw new HttpError(
+        404,
+        'Update Character Error',
+        `Character ${characterName} is not in you characters list !`,
+        true
+      );
+
+    const updatedCharacterProperties: Omit<Character, 'name' | 'level'> =
+      validateCharacterUpdate(characterToUpdate, newCharacterProperties);
+    const updatedCharacter: Character = await CharacterDM.updateCharacter(
+      currentUser,
+      characterName,
+      updatedCharacterProperties
+    );
+
+    return updatedCharacter;
+  } catch (error) {
+    throw new HttpError(
+      error.statusCode || 500,
+      'Update Character Error',
+      error.message || 'There was a problem updating the character',
       true
     );
   }

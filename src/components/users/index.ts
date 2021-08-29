@@ -8,6 +8,7 @@ import {
   deleteCharacter,
   getCharacter,
   getCharacters,
+  updateCharacter,
 } from '../characters/characterService';
 
 const router = express.Router();
@@ -96,6 +97,34 @@ router.delete(
         data: {
           code: 200,
           message: `Character ${characterName} deleted !`,
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
+
+router.post(
+  '/:id/characters/:characterName',
+  decodeHeader,
+  validateUserIdRequestParam,
+  async (req, res, next) => {
+    try {
+      const { id, characterName } = req.params;
+      const characterProperties = req.body;
+
+      const updatedCharacter = await updateCharacter(
+        id,
+        characterName,
+        characterProperties
+      );
+
+      return res.status(200).json({
+        data: {
+          code: 200,
+          message: `Character ${characterName} updated !`,
+          character: updatedCharacter,
         },
       });
     } catch (error) {

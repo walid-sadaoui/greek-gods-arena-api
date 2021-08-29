@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-const characterSchema = new Schema(
+const characterSchema = new Schema<CharacterData>(
   {
     name: {
       type: String,

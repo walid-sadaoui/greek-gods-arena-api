@@ -4,6 +4,8 @@ import * as faker from 'faker';
 import { UserInfo } from '../../components/users/userModel';
 import { GreekGods } from '../../components/characters/characterService';
 import { Character } from '../../components/characters/characterModel';
+import * as UserDM from '../../components/users/userDataManager';
+import * as CharacterDM from '../../components/characters/characterDataManager';
 
 export enum FakePassword {
   GOOD = 'abcABC123456!',
@@ -36,24 +38,58 @@ export const createUser = async (): Promise<UserInfo> => {
 };
 
 export const createCharacter = async (userId: string): Promise<Character> => {
-  const currentUser = await User.findOne({ _id: userId });
-  const newCharacter = new Character(GreekGods.ZEUS);
-  currentUser.characters.push(newCharacter);
-  await currentUser.save();
-  return newCharacter;
+  try {
+    const currentUser = await UserDM.getUser(userId);
+    const newCharacter = new Character(GreekGods.ZEUS);
+    currentUser.characters.push(newCharacter);
+    await currentUser.save();
+    return newCharacter;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const createCharacters = async (
   userId: string,
   number: number
 ): Promise<Character[]> => {
-  const currentUser = await User.findOne({ _id: userId });
-  const greekGods = Object.values(GreekGods);
-  for (let index = 0; index < (number > 10 ? 10 : number); index++) {
-    const greekGod = greekGods[index];
-    const newCharacter = new Character(greekGod);
-    currentUser.characters.push(newCharacter);
+  try {
+    const currentUser = await UserDM.getUser(userId);
+    const greekGods = Object.values(GreekGods);
+    for (let index = 0; index < (number > 10 ? 10 : number); index++) {
+      const greekGod = greekGods[index];
+      const newCharacter = new Character(greekGod);
+      currentUser.characters.push(newCharacter);
+    }
+    await currentUser.save();
+    return currentUser.toObject().characters;
+  } catch (error) {
+    throw new Error(error);
   }
-  await currentUser.save();
-  return currentUser.characters;
+};
+
+export const updateCharacter = async (
+  userId: string,
+  characterName: string
+): Promise<Character> => {
+  try {
+    const currentUser = await UserDM.getUser(userId);
+
+    const updatedCharacterProperties = {
+      skillPoints: 42,
+      health: 20,
+      attack: 12,
+      defense: 14,
+      magik: 2,
+      level: 1,
+    };
+    const updatedCharacter = await CharacterDM.updateCharacter(
+      currentUser,
+      characterName,
+      updatedCharacterProperties
+    );
+    return updatedCharacter;
+  } catch (error) {
+    throw new Error(error);
+  }
 };

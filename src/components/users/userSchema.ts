@@ -1,9 +1,10 @@
 import characterSchema from '../characters/characterSchema';
 import mongoose from 'mongoose';
+import { UserInfo } from './userModel';
 
 const { Schema } = mongoose;
 
-const userSchema = new Schema(
+const userSchema = new Schema<UserInfo>(
   {
     username: {
       type: String,
@@ -22,5 +23,5 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model<UserInfo>('User', userSchema);
 export default User;

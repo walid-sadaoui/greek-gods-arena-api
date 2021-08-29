@@ -1,5 +1,15 @@
 import { Character } from '../characters/characterModel';
 
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  password: string;
+  characters: Character[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface UserInfo {
   _id: string;
   username: string;

@@ -167,7 +167,7 @@ const logIn = async (
       throw new HttpError(409, 'Auth error', 'Invalid credentials', true);
     }
 
-    const { password: userPassword, __v, ...rest } = user;
+    const { password: userPassword, ...rest } = user;
     const userInfo: UserData = { ...rest };
 
     const token = generateJwt(userInfo, '1h');
