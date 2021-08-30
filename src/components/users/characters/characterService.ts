@@ -1,7 +1,7 @@
-import HttpError from '../../common/error/httpError';
-import { Character } from './characterModel';
+import HttpError from '../../../common/error/httpError';
+import { ICharacter } from './characterModel';
 import * as CharacterDM from './characterDataManager';
-import * as UserDM from '../users/userDataManager';
+import * as UserDM from '../userDataManager';
 
 export enum GreekGods {
   APHRODITE = 'APHRODITE',
@@ -28,7 +28,7 @@ interface CharacterProperties {
 }
 
 const validateCharacterNewProperties = (
-  character: Character,
+  character: ICharacter,
   updatedCharacterValues: CharacterProperties
 ) => {
   const { attack, defense, health, magik } = updatedCharacterValues;
@@ -86,7 +86,7 @@ const calculateHealthSkillPointsUsed = (
 };
 
 const validateSkillPoints = (
-  character: Character,
+  character: ICharacter,
   updatedCharacterValues: CharacterProperties
 ): number => {
   const healthkSkillPoints = calculateHealthSkillPointsUsed(
@@ -133,15 +133,15 @@ const validateCharacterName = (characterName: string) => {
 };
 
 const validateCharacterUpdate = (
-  character: Character,
+  character: ICharacter,
   updatedCharacterProperties: CharacterProperties
-): Omit<Character, 'name' | 'level'> => {
+): Omit<ICharacter, '_id' | 'name' | 'level'> => {
   validateCharacterNewProperties(character, updatedCharacterProperties);
   const updatedSkillPoints: number = validateSkillPoints(
     character,
     updatedCharacterProperties
   );
-  const characterProperties: Omit<Character, 'name' | 'level'> = {
+  const characterProperties: Omit<ICharacter, '_id' | 'name' | 'level'> = {
     ...updatedCharacterProperties,
     skillPoints: updatedSkillPoints,
   };
@@ -151,7 +151,7 @@ const validateCharacterUpdate = (
 export const createCharacter = async (
   characterName: string,
   userId: string
-): Promise<Character> => {
+): Promise<ICharacter> => {
   try {
     validateCharacterName(characterName);
 
@@ -204,10 +204,10 @@ export const createCharacter = async (
   }
 };
 
-export const getCharacters = async (userId: string): Promise<Character[]> => {
+export const getCharacters = async (userId: string): Promise<ICharacter[]> => {
   try {
     const currentUser = await UserDM.getUser(userId);
-    const characters: Character[] = await CharacterDM.getCharacters(
+    const characters: ICharacter[] = await CharacterDM.getCharacters(
       currentUser
     );
     return characters;
@@ -224,7 +224,7 @@ export const getCharacters = async (userId: string): Promise<Character[]> => {
 export const getCharacter = async (
   userId: string,
   characterName: string
-): Promise<Character> => {
+): Promise<ICharacter> => {
   try {
     validateCharacterName(characterName);
 
@@ -261,7 +261,7 @@ export const deleteCharacter = async (
     validateCharacterName(characterName);
 
     const currentUser = await UserDM.getUser(userId);
-    const characterToDelete: Character | undefined =
+    const characterToDelete: ICharacter | undefined =
       await CharacterDM.getCharacterByName(currentUser, characterName);
 
     if (!characterToDelete)
@@ -287,12 +287,12 @@ export const updateCharacter = async (
   userId: string,
   characterName: string,
   newCharacterProperties: CharacterProperties
-): Promise<Character> => {
+): Promise<ICharacter> => {
   try {
     validateCharacterName(characterName);
 
     const currentUser = await UserDM.getUser(userId);
-    const characterToUpdate: Character | undefined =
+    const characterToUpdate: ICharacter | undefined =
       await CharacterDM.getCharacterByName(currentUser, characterName);
     if (!characterToUpdate)
       throw new HttpError(
@@ -302,9 +302,11 @@ export const updateCharacter = async (
         true
       );
 
-    const updatedCharacterProperties: Omit<Character, 'name' | 'level'> =
-      validateCharacterUpdate(characterToUpdate, newCharacterProperties);
-    const updatedCharacter: Character = await CharacterDM.updateCharacter(
+    const updatedCharacterProperties: Omit<
+      ICharacter,
+      '_id' | 'name' | 'level'
+    > = validateCharacterUpdate(characterToUpdate, newCharacterProperties);
+    const updatedCharacter: ICharacter = await CharacterDM.updateCharacter(
       currentUser,
       characterName,
       updatedCharacterProperties

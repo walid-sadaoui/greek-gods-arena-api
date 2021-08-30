@@ -1,14 +1,14 @@
 import request from 'supertest';
-import app from '../../../index';
-import config from '../../../config';
-import * as db from '../../../common/testUtils/database';
-import * as DataFactory from '../../../common/testUtils/dataFactory';
+import app from '../../../../index';
+import config from '../../../../config';
+import * as db from '../../../../common/testUtils/database';
+import * as DataFactory from '../../../../common/testUtils/dataFactory';
 import { GreekGods } from '../characterService';
-import { Character } from '../characterModel';
-import { UserInfo } from '../../users/userModel';
-import User from '../../users/userSchema';
+import Character from '../characterSchema';
+import { IUser } from '../../userModel';
+import User from '../../userSchema';
 import * as CharacterDM from '../characterDataManager';
-import * as UserDM from '../../users/userDataManager';
+import * as UserDM from '../../userDataManager';
 
 config.nodeEnv = 'test';
 
@@ -17,7 +17,7 @@ let userId: string;
 
 beforeAll(async () => await db.connect());
 beforeEach(async () => {
-  const userInfo: UserInfo = await DataFactory.createUser();
+  const userInfo: IUser = await DataFactory.createUser();
   const loginResponse = await request(app)
     .post(`/login`)
     .send({ email: userInfo.email, password: userInfo.password });
@@ -37,15 +37,17 @@ describe('Characters', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ characterName });
 
+      const characterCreated = new Character({ name: characterName });
       expect(createCharacterResponse).toBeTruthy();
       expect(createCharacterResponse.status).toBe(200);
       expect(createCharacterResponse.body.data.message).toBe(
         'Character created !'
       );
       expect(createCharacterResponse.body.data.code).toBe(200);
-      expect(createCharacterResponse.body.data.character).toEqual(
-        new Character(characterName)
-      );
+      expect(createCharacterResponse.body.data.character).toEqual({
+        ...characterCreated.toObject(),
+        _id: createCharacterResponse.body.data.character._id,
+      });
     });
     test('When user not authenticated, should throw Error and return 401', async () => {
       const characterName: string = GreekGods.ZEUS;
@@ -160,15 +162,17 @@ describe('Characters', () => {
         .get(`/users/${userId}/characters/${characters[0].name}`)
         .set('Authorization', `Bearer ${token}`);
 
+      const characterRetrieved = new Character({ name: characters[0].name });
       expect(getCharacterResponse).toBeTruthy();
       expect(getCharacterResponse.status).toBe(200);
       expect(getCharacterResponse.body.data.message).toBe(
         `Character ${characters[0].name} found !`
       );
       expect(getCharacterResponse.body.data.code).toBe(200);
-      expect(getCharacterResponse.body.data.character).toEqual(
-        new Character(characters[0].name)
-      );
+      expect(getCharacterResponse.body.data.character).toEqual({
+        ...characterRetrieved.toObject(),
+        _id: getCharacterResponse.body.data.character._id,
+      });
     });
     test('When user not authenticated, should throw Error and return 401', async () => {
       const characters = await DataFactory.createCharacters(userId, 10);
@@ -309,6 +313,7 @@ describe('Characters', () => {
       expect(updateCharacterResponse.body.data.code).toBe(200);
       expect(updateCharacterResponse.body.data.character).toEqual({
         ...updatedCharacterValues,
+        _id: updateCharacterResponse.body.data.character._id,
         name: characters[0].name,
         level: characters[0].level,
         skillPoints: 28,

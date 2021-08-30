@@ -1,41 +1,19 @@
-import { Character } from '../characters/characterModel';
+import { ICharacter } from './characters/characterModel';
 
-export interface User {
+export interface IUser {
   _id: string;
   username: string;
   email: string;
   password: string;
-  characters: Character[];
+  characters: ICharacter[];
   createdAt: Date;
   updatedAt: Date;
 }
-
-export interface UserInfo {
-  _id: string;
-  username: string;
-  email: string;
-  password: string;
-  characters: Character[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface UserData {
   _id: string;
   username: string;
   email: string;
-  characters: Character[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface DatabaseUser extends UserInfo {
-  _id: string;
-  username: string;
-  email: string;
-  password: string;
-  characters: Character[];
-  __v: number;
+  characters: ICharacter[];
   createdAt: Date;
   updatedAt: Date;
 }
