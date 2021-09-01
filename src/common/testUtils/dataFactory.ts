@@ -63,7 +63,7 @@ export const createCharacters = async (
       currentUser.characters.push(newCharacter);
     }
     await currentUser.save();
-    return currentUser.toObject().characters;
+    return currentUser.characters;
   } catch (error) {
     throw new Error(error);
   }
