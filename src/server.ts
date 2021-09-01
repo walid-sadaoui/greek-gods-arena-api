@@ -4,7 +4,7 @@ import config from './config';
 import Debug from 'debug';
 import app from './index';
 
-const debug = Debug('simple-rpg-game-api:server');
+const debug = Debug('greek-gods-arena-api:server');
 const PORT: number = parseInt(config.port);
 
 if (config.databaseUrl) {

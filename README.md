@@ -1,1 +1,1 @@
-# simple-rpg-game-api
+# greek-gods-arena-api

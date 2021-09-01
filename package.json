@@ -1,26 +1,26 @@
 {
-  "name": "simple-rpg-game-api",
+  "name": "greek-gods-arena-api",
   "version": "0.1.0",
-  "description": "simple-rpg-game-api",
-  "main": "index.js",
+  "description": "greek-gods-arena-api",
+  "main": "index.ts",
   "scripts": {
     "test": "jest",
     "watch": "tsc -w",
     "start": "nodemon dist/index.js",
-    "dev": "set DEBUG=simple-rpg-game-api:* && nodemon --exec ts-node src/server.ts",
+    "dev": "set DEBUG=greek-gods-arena-api:* && nodemon --exec ts-node src/server.ts",
     "lint": "eslint --ext ts --ignore-path .gitignore .",
     "lint:fix": "eslint --ext ts . --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/walid-sadaoui/simple-rpg-game-api.git"
+    "url": "git+https://github.com/walid-sadaoui/greek-gods-arena-api.git"
   },
   "author": "Walid SADAOUI",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/walid-sadaoui/simple-rpg-game-api/issues"
+    "url": "https://github.com/walid-sadaoui/greek-gods-arena-api/issues"
   },
-  "homepage": "https://github.com/walid-sadaoui/simple-rpg-game-api#readme",
+  "homepage": "https://github.com/walid-sadaoui/greek-gods-arena-api#readme",
   "dependencies": {
     "argon2-ffi": "^2.0.0",
     "bluebird": "^3.7.2",
