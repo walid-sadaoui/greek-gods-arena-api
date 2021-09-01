@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { ICharacter } from './characterModel';
 import Character from './characterSchema';
 import { UserData } from '../userModel';
+import User from '../userSchema';
 
 export const createCharacter = async (
   user: UserData & mongoose.Document<any, any, UserData>,
@@ -53,6 +54,26 @@ export const updateCharacter = async (
   return updatedUser.toObject().characters[index];
 };
 
+export const updateCharacterById = async (
+  characterId: string,
+  characterName: string,
+  newCharacterProperties: Partial<ICharacter>
+): Promise<ICharacter | void> => {
+  const user = await User.findOne({ 'characters._id': characterId });
+  if (!user) throw new Error('Character not found');
+  const characterToUpdate = findCharacterByName(
+    user.toObject().characters,
+    characterName
+  );
+  if (!characterToUpdate) throw new Error('Character not found !');
+  const updatedCharacter = await updateCharacter(
+    user,
+    characterToUpdate.name,
+    newCharacterProperties
+  );
+  return updatedCharacter;
+};
+
 export const deleteCharacter = async (
   user: UserData & mongoose.Document<any, any, UserData>,
   characterName: string
@@ -64,4 +85,14 @@ export const deleteCharacter = async (
     );
   user.characters = updatedCharactersList;
   await user.save();
+};
+
+const findCharacterByName = (
+  characters: ICharacter[],
+  characterName: string
+): ICharacter | undefined => {
+  const character: ICharacter | undefined = characters.find(
+    (character: ICharacter) => character.name === characterName
+  );
+  return character;
 };

@@ -2,7 +2,7 @@ import { hashPassword } from '../../components/auth/authService';
 import User from '../../components/users/userSchema';
 import * as faker from 'faker';
 import { IUser } from '../../components/users/userModel';
-import { GreekGods } from '../../components/users/characters/characterService';
+import { GreekGods } from '../../components/users/characters/characterModel';
 import { ICharacter } from '../../components/users/characters/characterModel';
 import Character from '../../components/users/characters/characterSchema';
 import * as UserDM from '../../components/users/userDataManager';
@@ -88,6 +88,24 @@ export const updateCharacter = async (
       currentUser,
       characterName,
       updatedCharacterProperties
+    );
+    return updatedCharacter;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateCharacterProperties = async (
+  userId: string,
+  characterName: string,
+  newCharacterProperties: Partial<ICharacter>
+): Promise<ICharacter> => {
+  try {
+    const currentUser = await UserDM.getUser(userId);
+    const updatedCharacter = await CharacterDM.updateCharacter(
+      currentUser,
+      characterName,
+      newCharacterProperties
     );
     return updatedCharacter;
   } catch (error) {

@@ -51,4 +51,25 @@ const validateUserIdRequestParam = (
   }
 };
 
-export { decodeHeader, validateUserIdRequestParam };
+const validateUserIdRequestBody = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
+  try {
+    const { userId } = req.body;
+    const user = <UserData>req.user;
+    if (user?._id !== userId)
+      throw new HttpError(
+        401,
+        'Auth error',
+        `You are not authorized to perform this action !`,
+        true
+      );
+    return next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { decodeHeader, validateUserIdRequestParam, validateUserIdRequestBody };

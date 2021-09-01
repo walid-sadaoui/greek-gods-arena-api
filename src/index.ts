@@ -7,6 +7,7 @@ import notFoundHandler from './common/error/not-found.middleware';
 import config from './config';
 import authRouter from './components/auth';
 import usersRouter from './components/users';
+import fightsRouter from './components/fights';
 
 const app = express();
 app.use(helmet());
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use('/', authRouter);
 app.use('/users', usersRouter);
+app.use('/fights', fightsRouter);
 app.use(errorHandler);
 app.use(notFoundHandler);
 

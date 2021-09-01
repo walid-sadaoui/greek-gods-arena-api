@@ -3,7 +3,7 @@ import app from '../../../../index';
 import config from '../../../../config';
 import * as db from '../../../../common/testUtils/database';
 import * as DataFactory from '../../../../common/testUtils/dataFactory';
-import { GreekGods } from '../characterService';
+import { GreekGods } from '../characterModel';
 import Character from '../characterSchema';
 import { IUser } from '../../userModel';
 import User from '../../userSchema';
@@ -37,6 +37,26 @@ describe('Characters', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ characterName });
 
+      const characterCreated = new Character({ name: characterName });
+      expect(createCharacterResponse).toBeTruthy();
+      expect(createCharacterResponse.status).toBe(200);
+      expect(createCharacterResponse.body.data.message).toBe(
+        'Character created !'
+      );
+      expect(createCharacterResponse.body.data.code).toBe(200);
+      expect(createCharacterResponse.body.data.character).toEqual({
+        ...characterCreated.toObject(),
+        _id: createCharacterResponse.body.data.character._id,
+      });
+    });
+    test('When user logged in and valid Greek God name provided and Greek God name already used by another user, should add a new character to the specified user and return 200', async () => {
+      const secondUser: IUser = await DataFactory.createUser();
+      const character = await DataFactory.createCharacter(secondUser._id);
+      const characterName = character.name;
+      const createCharacterResponse = await request(app)
+        .post(`/users/${userId}/characters`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ characterName });
       const characterCreated = new Character({ name: characterName });
       expect(createCharacterResponse).toBeTruthy();
       expect(createCharacterResponse.status).toBe(200);

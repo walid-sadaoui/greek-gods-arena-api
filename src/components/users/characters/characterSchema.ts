@@ -7,7 +7,6 @@ export const characterSchema = new Schema<ICharacter>({
   name: {
     type: String,
     required: true,
-    unique: [true, 'You already have a character with this name'],
     sparse: true,
   },
   skillPoints: { type: Number, required: true, default: 12 },
