@@ -2,13 +2,13 @@
   "name": "greek-gods-arena-api",
   "version": "0.1.0",
   "description": "greek-gods-arena-api",
-  "main": "index.ts",
+  "main": "server.js",
   "scripts": {
     "test": "jest",
     "build": "tsc",
     "postinstall": "npm run build",
     "watch": "tsc -w",
-    "start": "node dist/index.js",
+    "start": "node dist/server.js",
     "dev": "set DEBUG=greek-gods-arena-api:* && nodemon --exec ts-node src/server.ts",
     "lint": "eslint --ext ts --ignore-path .gitignore .",
     "lint:fix": "eslint --ext ts . --fix"
