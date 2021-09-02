@@ -6,7 +6,7 @@ orbs:
   heroku: circleci/heroku@0.0.10
 
 workflows:
-  sample:
+  test:
     jobs:
       - node/test:
           version: '14.17.4'
@@ -16,3 +16,8 @@ workflows:
   heroku_deploy:
     jobs:
       - heroku/deploy-via-git
+        requires:
+        - test
+        filters:
+            branches:
+              only: main
