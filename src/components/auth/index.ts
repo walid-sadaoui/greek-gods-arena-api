@@ -1,6 +1,8 @@
 import { UserData } from '../users/userModel';
 import express from 'express';
 import { logIn, signUp } from './authService';
+import { decodeHeader } from './authMiddlewares';
+import { getUser } from '../users/userService';
 
 const router = express.Router();
 
@@ -39,6 +41,23 @@ router.post('/login', async (req, res, next) => {
         user: userInfo,
         token,
         refreshToken,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/me', decodeHeader, async (req, res, next) => {
+  try {
+    const { _id } = <UserData>req.user;
+    const currentUser = await getUser(_id);
+
+    return res.status(200).json({
+      data: {
+        code: 200,
+        message: 'Current User Found !',
+        user: currentUser,
       },
     });
   } catch (error) {

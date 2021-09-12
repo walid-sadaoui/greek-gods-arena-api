@@ -13,10 +13,11 @@ const decodeHeader = (
     if (!token) {
       throw new HttpError(401, 'Auth error', 'No token provided', true);
     }
-    if (token.startsWith('Bearer ')) {
+    if (token.startsWith('Bearer')) {
       token = token.slice(7, token.length);
-      if (!token || token === '')
+      if (!token || token === '') {
         throw new HttpError(401, 'Auth error', 'No token provided', true);
+      }
     }
     const decoded = <UserData>verifyJWT(token);
     if (!decoded)

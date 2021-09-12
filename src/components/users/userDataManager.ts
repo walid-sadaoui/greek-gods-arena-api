@@ -10,3 +10,7 @@ export const getUser = async (
   if (!user) throw new HttpError(404, 'Get User error', 'User not found', true);
   return user;
 };
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  await User.deleteOne({ _id: userId });
+};
