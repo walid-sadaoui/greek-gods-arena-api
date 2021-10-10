@@ -9,8 +9,13 @@ const errorHandler = (
   _next: NextFunction
 ): void => {
   const status = error.statusCode || 500;
-
-  response.status(status).send({ error });
+  const httpError = new HttpError(
+    status,
+    error.description || 'Server Error',
+    error.message,
+    error.isOperational || false
+  );
+  response.status(status).send({ error: httpError });
 };
 
 export default errorHandler;

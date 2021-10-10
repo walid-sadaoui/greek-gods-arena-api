@@ -190,4 +190,81 @@ describe('Fights', () => {
       );
     });
   });
+  describe('Get Fight : GET /fights/:id', () => {
+    test('When user logged in and valid fightId provided, should retrieve the fight and return 200', async () => {
+      const currentUserCharacters = await DataFactory.createCharacters(
+        userId,
+        10
+      );
+      const secondUser: IUser = await DataFactory.createUser();
+      const secondUserCharacters = await DataFactory.createCharacters(
+        secondUser._id,
+        10
+      );
+      await DataFactory.updateCharacterProperties(
+        secondUser._id,
+        secondUserCharacters[0].name,
+        { level: 5, attack: 10, defense: 4, magik: 1, health: 15 }
+      );
+      await DataFactory.updateCharacterProperties(
+        userId,
+        currentUserCharacters[0].name,
+        { level: 5, attack: 8, defense: 2, magik: 2, health: 18 }
+      );
+
+      const fight = await DataFactory.newFight(userId, secondUser._id);
+
+      const newFightResponse = await request(app)
+        .get(`/fights/${fight._id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(newFightResponse).toBeTruthy();
+      expect(newFightResponse.status).toBe(200);
+      expect(newFightResponse.body.data.message).toBe('Fight retrieved !');
+      expect(newFightResponse.body.data.code).toBe(200);
+      expect(newFightResponse.body.data.fight.finished).toBe(true);
+      expect(newFightResponse.body.data.fight.winner).toBeTruthy();
+      expect(newFightResponse.body.data.fight.loser).toBeTruthy();
+    });
+    test('When user not authenticated, should throw Error and return 401', async () => {
+      const currentUserCharacters = await DataFactory.createCharacters(
+        userId,
+        10
+      );
+      const secondUser: IUser = await DataFactory.createUser();
+      const secondUserCharacters = await DataFactory.createCharacters(
+        secondUser._id,
+        10
+      );
+      await DataFactory.updateCharacterProperties(
+        secondUser._id,
+        secondUserCharacters[0].name,
+        { level: 5, attack: 10, defense: 4, magik: 1, health: 15 }
+      );
+      await DataFactory.updateCharacterProperties(
+        userId,
+        currentUserCharacters[0].name,
+        { level: 5, attack: 8, defense: 2, magik: 2, health: 18 }
+      );
+
+      const fight = await DataFactory.newFight(userId, secondUser._id);
+
+      const newFightResponse = await request(app)
+        .get(`/fights/${fight._id}`)
+        .send({ userId, characterName: currentUserCharacters[0].name });
+
+      expect(newFightResponse).toBeTruthy();
+      expect(newFightResponse.status).toBe(401);
+      expect(newFightResponse.body.error.message).toBe('No token provided');
+    });
+    test('When invalid fightId provided, should throw error and return 404', async () => {
+      const newFightResponse = await request(app)
+        .get(`/fights/61471d8ac1b75e17a05e17fb`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(newFightResponse).toBeTruthy();
+      expect(newFightResponse.status).toBe(404);
+      expect(newFightResponse.body.error.message).toBe(`Fight not found !`);
+    });
+  });
 });

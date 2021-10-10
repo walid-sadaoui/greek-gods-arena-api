@@ -1,16 +1,17 @@
 import { turnSchema } from './turns/turnSchema';
 import mongoose from 'mongoose';
+import { characterSchema } from '../users/characters/characterSchema';
 
 const { Schema } = mongoose;
 
 const fightSchema = new Schema(
   {
-    firstOpponentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    firstOpponent: {
+      type: characterSchema,
       required: true,
     },
-    secondOpponentId: {
-      type: mongoose.Schema.Types.ObjectId,
+    secondOpponent: {
+      type: characterSchema,
       required: true,
     },
     winner: {

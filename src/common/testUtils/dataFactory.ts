@@ -7,6 +7,8 @@ import { ICharacter } from '../../components/users/characters/characterModel';
 import Character from '../../components/users/characters/characterSchema';
 import * as UserDM from '../../components/users/userDataManager';
 import * as CharacterDM from '../../components/users/characters/characterDataManager';
+import * as FightUtils from '../../components/fights/fightUtils';
+import { IFight } from 'components/fights/fightModel';
 
 export enum FakePassword {
   GOOD = 'abcABC123456!',
@@ -108,6 +110,24 @@ export const updateCharacterProperties = async (
       newCharacterProperties
     );
     return updatedCharacter;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const newFight = async (
+  firstUserId: string,
+  secondUserId: string
+): Promise<IFight> => {
+  try {
+    const firstUser = await UserDM.getUser(firstUserId);
+    const secondUser = await UserDM.getUser(secondUserId);
+
+    const fight = await FightUtils.launchFight(
+      firstUser.characters[0],
+      secondUser.characters[1]
+    );
+    return fight;
   } catch (error) {
     throw new Error(error);
   }
