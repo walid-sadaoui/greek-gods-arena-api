@@ -19,7 +19,7 @@ export const turnSchema = new Schema<ITurn>({
     defenseSkillPoints: { type: Number },
     remainingHealth: { type: Number },
   },
-  damages: { type: Boolean },
+  damages: { type: Number },
   attackSuccess: { type: Boolean },
 });
 

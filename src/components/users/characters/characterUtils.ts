@@ -48,7 +48,11 @@ export const calculateSkillPointsUsed = (
 
   let skillPointsUsed = 0;
   for (let index = 0; index < newValue - previousValue; index++) {
-    skillPointsUsed = skillPointsUsed + Math.ceil((previousValue + index) / 5);
+    skillPointsUsed =
+      skillPointsUsed +
+      (previousValue + index === 0
+        ? 1
+        : Math.ceil((previousValue + index) / 5));
   }
   return skillPointsUsed;
 };

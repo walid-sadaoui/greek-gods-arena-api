@@ -1,5 +1,6 @@
 import config from '../config';
-import { signup } from './auth.swagger';
+import { login, signup } from './auth.swagger';
+import { schemas } from './schemas';
 
 export const swaggerDocument = {
   openapi: '3.0.3',
@@ -29,19 +30,19 @@ export const swaggerDocument = {
   ],
   tags: [
     {
-      name: 'signup',
-    },
-    {
-      name: 'auth',
+      name: 'Auth',
     },
   ],
   paths: {
     '/signup': {
       post: signup,
     },
+    '/login': {
+      post: login,
+    },
   },
   components: {
-    schemas: {},
+    schemas: schemas,
     securitySchemes: {
       bearerAuth: {
         type: 'http',

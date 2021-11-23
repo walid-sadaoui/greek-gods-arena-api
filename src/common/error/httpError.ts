@@ -1,5 +1,5 @@
 export default class HttpError extends Error {
-  statusCode: number;
+  code: number;
 
   description: string;
 
@@ -8,14 +8,14 @@ export default class HttpError extends Error {
   isOperational: boolean;
 
   constructor(
-    statusCode: number,
+    code: number,
     descritpion: string,
     message: string,
     isOperational: boolean
   ) {
     super();
 
-    this.statusCode = statusCode;
+    this.code = code;
     this.description = descritpion;
     this.message = message;
     this.isOperational = isOperational;

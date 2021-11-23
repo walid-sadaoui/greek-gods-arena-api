@@ -4,7 +4,7 @@
   "description": "greek-gods-arena-api",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "tsc",
     "postinstall": "npm run build",
     "watch": "tsc -w",

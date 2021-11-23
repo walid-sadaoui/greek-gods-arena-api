@@ -122,7 +122,7 @@ const signUp = async (
     return userInfo;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Auth error',
       error.message || 'There was a problem logging into your account',
       true
@@ -176,7 +176,7 @@ const logIn = async (
     return { userInfo, token, refreshToken };
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Auth error',
       error.message || 'There was a problem logging into your account',
       true

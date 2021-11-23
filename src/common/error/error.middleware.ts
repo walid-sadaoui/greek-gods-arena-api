@@ -8,7 +8,7 @@ const errorHandler = (
   // eslint-disable-next-line
   _next: NextFunction
 ): void => {
-  const status = error.statusCode || 500;
+  const status = error.code || 500;
   const httpError = new HttpError(
     status,
     error.description || 'Server Error',

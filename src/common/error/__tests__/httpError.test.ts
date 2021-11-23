@@ -12,7 +12,7 @@ describe('Http Error', () => {
       false
     );
 
-    expect(httpError.statusCode).toBe(404);
+    expect(httpError.code).toBe(404);
     expect(httpError.description).toBe('Example Error');
     expect(httpError.message).toBe('Example not found');
     expect(httpError.isOperational).toBe(false);

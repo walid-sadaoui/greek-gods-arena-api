@@ -55,7 +55,7 @@ export const createCharacter = async (
     return createdCharacter;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Create Character Error',
       error.message || 'There was a problem creating the new character',
       true
@@ -72,7 +72,7 @@ export const getCharacters = async (userId: string): Promise<ICharacter[]> => {
     return characters;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Get Characters Error',
       error.message || 'There was a problem retrieving the characters',
       true
@@ -104,7 +104,7 @@ export const getCharacter = async (
     return character;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Get Character Error',
       error.message || 'There was a problem retrieving the characters',
       true
@@ -134,7 +134,7 @@ export const deleteCharacter = async (
     await CharacterDM.deleteCharacter(currentUser, characterName);
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Delete Characters Error',
       error.message || 'There was a problem retrieving the characters',
       true
@@ -174,7 +174,7 @@ export const updateCharacter = async (
     return updatedCharacter;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Update Character Error',
       error.message || 'There was a problem updating the character',
       true

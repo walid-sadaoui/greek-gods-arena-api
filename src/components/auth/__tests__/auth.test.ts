@@ -43,7 +43,7 @@ describe('Authentication', () => {
         'Username, Email and Password are required'
       );
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(400);
+      expect(signupResponse.body.error.code).toBe(400);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When password not provided, should throw error and return 400', async () => {
@@ -60,7 +60,7 @@ describe('Authentication', () => {
         'Username, Email and Password are required'
       );
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(400);
+      expect(signupResponse.body.error.code).toBe(400);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When email not provided, should throw error and return 400', async () => {
@@ -77,7 +77,7 @@ describe('Authentication', () => {
         'Username, Email and Password are required'
       );
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(400);
+      expect(signupResponse.body.error.code).toBe(400);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When username is less than 3 characters, should throw error and return 422', async () => {
@@ -95,7 +95,7 @@ describe('Authentication', () => {
         'Username must be at leats 3 characters'
       );
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(422);
+      expect(signupResponse.body.error.code).toBe(422);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When username already exists, should throw error and return 409', async () => {
@@ -114,7 +114,7 @@ describe('Authentication', () => {
       expect(signupResponse.status).toBe(409);
       expect(signupResponse.body.error.message).toBe('Username already exists');
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(409);
+      expect(signupResponse.body.error.code).toBe(409);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When email is not valid, should throw error and return 422', async () => {
@@ -130,7 +130,7 @@ describe('Authentication', () => {
       expect(signupResponse.status).toBe(422);
       expect(signupResponse.body.error.message).toBe('Invalid email format');
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(422);
+      expect(signupResponse.body.error.code).toBe(422);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When email already exists, should throw error and return 409', async () => {
@@ -149,7 +149,7 @@ describe('Authentication', () => {
       expect(signupResponse.status).toBe(409);
       expect(signupResponse.body.error.message).toBe('Email already exists');
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(409);
+      expect(signupResponse.body.error.code).toBe(409);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
     test('When password is not with the right format, should throw error and return 422', async () => {
@@ -168,7 +168,7 @@ describe('Authentication', () => {
         'Invalid password format : password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 digit, 1 special character and at most 26 characters'
       );
       expect(signupResponse.body.error.description).toBe('Auth error');
-      expect(signupResponse.body.error.statusCode).toBe(422);
+      expect(signupResponse.body.error.code).toBe(422);
       expect(signupResponse.body.error.isOperational).toBe(true);
     });
   });
@@ -201,7 +201,7 @@ describe('Authentication', () => {
       expect(loginResponse.status).toBe(422);
       expect(loginResponse.body.error.message).toBe('Invalid email format');
       expect(loginResponse.body.error.description).toBe('Auth error');
-      expect(loginResponse.body.error.statusCode).toBe(422);
+      expect(loginResponse.body.error.code).toBe(422);
       expect(loginResponse.body.error.isOperational).toBe(true);
     });
     test('When password is not with the right format, should throw error and return 422', async () => {
@@ -219,7 +219,7 @@ describe('Authentication', () => {
         'Invalid password format : password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 digit, 1 special character and at most 26 characters'
       );
       expect(loginResponse.body.error.description).toBe('Auth error');
-      expect(loginResponse.body.error.statusCode).toBe(422);
+      expect(loginResponse.body.error.code).toBe(422);
       expect(loginResponse.body.error.isOperational).toBe(true);
     });
     test('When user does not exist, should throw error and return 409', async () => {
@@ -235,7 +235,7 @@ describe('Authentication', () => {
       expect(loginResponse).toBeTruthy();
       expect(loginResponse.status).toBe(409);
       expect(loginResponse.body.error.message).toBe('Invalid credentials');
-      expect(loginResponse.body.error.statusCode).toBe(409);
+      expect(loginResponse.body.error.code).toBe(409);
     });
     test('When password is wrong, should throw error and return 409', async () => {
       const userInfo: IUser = await DataFactory.createUser();
@@ -248,7 +248,7 @@ describe('Authentication', () => {
       expect(loginResponse).toBeTruthy();
       expect(loginResponse.status).toBe(409);
       expect(loginResponse.body.error.message).toBe('Invalid credentials');
-      expect(loginResponse.body.error.statusCode).toBe(409);
+      expect(loginResponse.body.error.code).toBe(409);
     });
     test('When email not provided, should throw error and return 400', async () => {
       const userInfo: IUser = await DataFactory.createUser();
@@ -262,7 +262,7 @@ describe('Authentication', () => {
       expect(loginResponse.body.error.message).toBe(
         'Email and Password are required'
       );
-      expect(loginResponse.body.error.statusCode).toBe(400);
+      expect(loginResponse.body.error.code).toBe(400);
     });
     test('When password not provided, should throw error and return 400', async () => {
       const userInfo: IUser = await DataFactory.createUser();
@@ -276,7 +276,7 @@ describe('Authentication', () => {
       expect(loginResponse.body.error.message).toBe(
         'Email and Password are required'
       );
-      expect(loginResponse.body.error.statusCode).toBe(400);
+      expect(loginResponse.body.error.code).toBe(400);
     });
   });
 });

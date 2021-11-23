@@ -49,7 +49,7 @@ export const newFight = async (
     return fight;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Fight Error',
       error.message || 'There was an error processing the fight',
       true
@@ -65,7 +65,7 @@ export const getFight = async (fightId: string): Promise<IFight> => {
     return fight;
   } catch (error) {
     throw new HttpError(
-      error.statusCode || 500,
+      error.code || 500,
       'Fight Error',
       error.message || 'There was an error retreiving the fight',
       true
